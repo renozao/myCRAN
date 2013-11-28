@@ -1,0 +1,65 @@
+#!/bin/sh
+
+
+action=$1
+
+if [ "$action" = "init" ]; then
+
+	git checkout --orphan develop
+	rm -rf ./*
+
+	echo "* Pushing to github"
+	git push --set-upstream origin develop
+
+	# back to master
+	git checkout master
+
+elif [ "$action" = "add" ]; then
+	pkg=$2
+	git checkout develop
+	mkdir $pkg
+	touch $pkg/.gitignore
+	git add $pkg/.gitignore
+	git commit -m "Add package ${pkg}/ sub-directory"
+	git remote add -f $pkg https://github.com/renozao/${pkg}.git
+	git subtree add --prefix=${pkg}/pkg $pkg develop --squash
+
+	echo "* Pushing to github"
+	git push
+
+	# back to master
+	git checkout master
+
+elif [ "$action" = "update" ]; then
+	# update source code for R-forge to fetch
+	git checkout develop
+	for dir in ./*/
+	do
+	    dir=`echo ${dir%*/} | sed -e 's/\.\///'`
+	    echo "## Updating package ${dir}"
+	    git subtree pull --prefix=${dir}/pkg $dir develop --squash
+	    echo "##"
+	    echo
+	done
+
+	echo "* Pushing to github"
+	git push
+
+	# back to master
+	git checkout master
+
+elif [ "$action" = "gh" ]; then
+
+	# update static pages
+	git checkout gh-pages
+	for dir in ./web/*/
+	do
+	    dir=`echo ${dir%*/} | sed -e 's/\.\/web\///'`
+	    echo ${dir}
+	    #git subtree pull --prefix=web/${dir} $dir gh-pages:develop
+	done
+	
+	git checkout master
+fi
+
+
