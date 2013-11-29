@@ -30,7 +30,7 @@ elif [ "$action" = "add" ]; then
 		echo "warning: subtree $prefix already exists -> aborting adding package"
 	else
 		git remote add -f $pkg https://github.com/renozao/${pkg}.git
-		git subtree add --prefix=$prefix $pkg develop --squash
+		git subtree add --prefix=$prefix $pkg/develop
 	fi
 	
 	echo "* Pushing to github"
