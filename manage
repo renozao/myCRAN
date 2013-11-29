@@ -76,7 +76,7 @@ elif [ "$action" = "update" ]; then
 	git push
 
 	# back to master
-	#git checkout master
+	git checkout master
 
 elif [ "$action" = "gh" ]; then
 
