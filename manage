@@ -25,43 +25,55 @@ elif [ "$action" = "add" ]; then
 		git add $pkgdir
 		git commit -m "Create package subtree $pkgdir/ parent directory"
 	fi
-	echo "Add package $pkg as ${prefix}/ sub-directory"
-	git remote add -f $pkg https://github.com/renozao/${pkg}.git
-	git subtree add --prefix=$prefix $pkg develop --squash
-
+	echo "* Adding package $pkg as ${prefix}/ sub-directory"
+	if [ -d $prefix ]; then
+		echo "warning: subtree $prefix already exists -> aborting adding package"
+	else
+		git remote add -f $pkg https://github.com/renozao/${pkg}.git
+		git subtree add --prefix=$prefix $pkg develop --squash
+	fi
+	
 	echo "* Pushing to github"
 	git push
 
 	# back to master
-	#git checkout master
+	git checkout master
 
 elif [ "$action" = "update" ]; then
 	# update source code for R-forge to fetch
 
 	update_packages()
 	{
-		local dir 
-		local prefix=/pkg
+		local dir
 		for dir in $1/*/
 		do
 		    dir=`echo ${dir%*/} | sed -e 's/\.\///'`
-		    if [ -f "${dir}/pkg/DESCRIPTION" ]
-		    then
-			echo "## Updating package $dir in `pwd`"
-			echo "git subtree pull --prefix=$dir$prefix $dir develop --squash"
+		    local pkg=$dir
+		    local prefix=$dir/pkg
+
+		    if [ ! -z $2 ]; then 
+			pkg=`basename $dir`
+			prefix=$dir
+	    	    fi
+
+		    if [ -f "${prefix}/DESCRIPTION" ]; then
+			echo "** Updating package $pkg in $prefix"
+			git subtree pull --prefix=$prefix $pkg develop --squash
 			echo "##"   
 			echo
-		    else
-			update_packages ${dir}/pkg
+		    elif [ -d "$dir/pkg" ]; then
+			update_packages ${dir}/pkg true
+		    elif [ ! -f "$1/DESCRIPTION" ]; then
+			echo "** Skipping directory $prefix: no package found" 
 		    fi
 		done
 	}
 
+	git checkout develop
 	update_packages .
-	#git checkout develop
 
 	echo "* Pushing to github"
-	#git push
+	git push
 
 	# back to master
 	#git checkout master
