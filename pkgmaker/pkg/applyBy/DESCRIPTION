@@ -1,0 +1,23 @@
+Package: applyBy
+Type: Package
+Title: Subset-wise apply functions to aggregate rows or columns of matrix-like
+    objects
+Version: 1.0
+Date: 2013-11-29
+Authors@R: c(person('Renaud', 'Gaujoux', email = 'renaud@tx.technion.ac.il',
+    role = c('aut', 'cre')))
+Description: This package defines a function applyBy that enables applying a
+    function along margins of matrix-like objects separately within groups of
+    columns/rows defined by factor(s), e.g., computing aggregated summary
+    statistics. It is essentially a wrapper around functions from the the
+    matrixStats package, which provide very fast alternative implementation to
+    the base aggregate function.
+License: GPL (>= 2)
+Imports:
+    matrixStats,
+    pkgmaker
+Suggests:
+    Biobase
+Collate:
+    'applyBy.R'
+    'package.R'
