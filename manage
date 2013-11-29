@@ -19,15 +19,18 @@ elif [ "$action" = "add" ]; then
 	if [ "$3" != "" ]; then prefix=$3/pkg/$pkg; fi
 	pkgdir=`dirname $prefix`
 	git checkout develop
-	mkdir -p $pkgdir
-	touch $pkgdir/.gitignore
-	git add $pkgdir
-	git commit -m "Add package $pkg as ${prefix}/ sub-directory"
+	if [ ! -d $pkgdir ]; then
+		mkdir -p $pkgdir
+		touch $pkgdir/.gitignore
+		git add $pkgdir
+		git commit -m "Create package subtree $pkgdir/ parent directory"
+	fi
+	echo "Add package $pkg as ${prefix}/ sub-directory"
 	git remote add -f $pkg https://github.com/renozao/${pkg}.git
 	git subtree add --prefix=$prefix $pkg develop --squash
 
 	echo "* Pushing to github"
-	#git push
+	git push
 
 	# back to master
 	#git checkout master
