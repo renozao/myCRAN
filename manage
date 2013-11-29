@@ -1,14 +1,14 @@
 #!/bin/sh
 
 action=$1
-
+repo_branch=rforge
 if [ "$action" = "init" ]; then
 
-	git checkout --orphan develop
+	git checkout --orphan rforge
 	rm -rf ./*
 
 	echo "* Pushing to github"
-	git push --set-upstream origin develop
+	git push --set-upstream origin $repo_branch
 
 	# back to master
 	git checkout master
@@ -18,7 +18,7 @@ elif [ "$action" = "add" ]; then
 	prefix=$pkg/pkg
 	if [ "$3" != "" ]; then prefix=$3/pkg/$pkg; fi
 	pkgdir=`dirname $prefix`
-	git checkout develop
+	git checkout $repo_branch
 	if [ ! -d $pkgdir ]; then
 		mkdir -p $pkgdir
 		touch $pkgdir/.gitignore
@@ -86,7 +86,7 @@ elif [ "$action" = "gh" ]; then
 	do
 	    dir=`echo ${dir%*/} | sed -e 's/\.\/web\///'`
 	    echo ${dir}
-	    #git subtree pull --prefix=web/${dir} $dir gh-pages:develop
+	    #git subtree pull --prefix=web/${dir} $dir gh-pages:$repo_branch
 	done
 	
 	git checkout master
